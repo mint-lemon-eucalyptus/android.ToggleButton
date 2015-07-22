@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="ToggleButton">
+        <attr name="text" format="string" />
+        <attr name="textColor" format="string" />
+        <attr name="width" format="dimension"/>
+        <attr name="height" format="dimension"/>
+        <attr name="track_color_off" format="reference" />
+        <attr name="track_color_on" format="reference" />
+        <attr name="thumb_color" format="reference" />
+    </declare-styleable>
+</resources>
