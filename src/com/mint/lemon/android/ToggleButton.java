@@ -19,6 +19,7 @@ import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -32,7 +33,7 @@ public class ToggleButton extends RelativeLayout implements View.OnClickListener
     int trackWidth;
     int trackHeight;
 
-    private boolean state;
+    private boolean checked;
 
     private Boolean _crossfadeRunning = false;
     private ObjectAnimator _oaLeft, _oaRight;
@@ -87,24 +88,13 @@ public class ToggleButton extends RelativeLayout implements View.OnClickListener
         _oaRight = ObjectAnimator.ofFloat(toggleCircle, "x", 0, trackWidth / 2).setDuration(250);
 
 
-        setState();
+        //    setState();
     }
 
     public ToggleButton(Context context) {
         this(context, null);
     }
 
-    public void setState() {
-        if (isInEditMode()) return; //isInEditMode(): if being rendered in IDE preview, skip code that will break
-
-        if (state) {
-            toggleCircle.setX(trackWidth / 2);
-            _crossfadeViews(background_oval_off, background_oval_on, 1);
-        } else {
-            toggleCircle.setX(0);
-            _crossfadeViews(background_oval_on, background_oval_off, 1);
-        }
-    }
 
     private void _crossfadeViews(final View begin, View end, int duration) {
         _crossfadeRunning = true;
@@ -123,17 +113,38 @@ public class ToggleButton extends RelativeLayout implements View.OnClickListener
 
     @Override
     public void onClick(View view) {
+        checked = !checked;
+        toggle(true);
+        if (mListener != null) {
+            mListener.onCheckedChanged(null, checked);
+        }
+    }
+
+    private void toggle(boolean animate) {
         if (_oaLeft.isRunning() || _oaRight.isRunning() || _crossfadeRunning) return;
 
-        boolean pref = state;
-        if (pref) {
-            _oaLeft.start();
-            _crossfadeViews(background_oval_on, background_oval_off, 110);
-        } else {
+        if (checked) {
             _oaRight.start();
-            _crossfadeViews(background_oval_off, background_oval_on, 400);
+            _crossfadeViews(background_oval_off, background_oval_on, animate ? 400 : 0);
+        } else {
+            _oaLeft.start();
+            _crossfadeViews(background_oval_on, background_oval_off, animate ? 110 : 0);
         }
 
-        state = !state;
+    }
+
+    public void setChecked(boolean value) {
+        checked = value;
+        toggle(false);
+    }
+
+    public boolean isChecked() {
+        return checked;
+    }
+
+    CompoundButton.OnCheckedChangeListener mListener;
+
+    public void setOnCheckedChangeListener(CompoundButton.OnCheckedChangeListener listener) {
+        this.mListener = listener;
     }
 }
